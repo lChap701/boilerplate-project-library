@@ -1,5 +1,6 @@
 "use strict";
 
+const e = require("express");
 const crud = require("../crud");
 
 /**
@@ -24,28 +25,72 @@ module.exports = function (app) {
     })
 
     .delete(function (req, res) {
-      console.log(req.body);
       crud
-        .deleteBook(req.body._id)
-        .then(() => res.send("delete successful"))
-        .catch(() => res.send("no book exists"));
+        .deleteAllBooks()
+        .then(() =>
+          crud
+            .deleteAllComments()
+            .then(() => res.send("complete delete successful"))
+        );
     });
 
   app
     .route("/api/books/:id")
     .get(function (req, res) {
-      let bookid = req.params.id;
-      //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
+      crud.getBook(req.params.id).then((book) => {
+        if (book) {
+          res.json(book);
+        } else {
+          res.send("no book exists");
+        }
+      });
     })
 
     .post(function (req, res) {
       let bookid = req.params.id;
-      let comment = req.body.comment;
-      //json res format same as .get
+
+      async () => {
+        try {
+          const book = await crud.getBook(bookid);
+
+          if (book) {
+            const comment = await crud.addComment({
+              comment: req.body.comment,
+              book: book,
+            });
+            console.log(comment);
+
+            crud.updateBookComments(book, comment);
+            console.log(book);
+            const result = await crud.updateCommentcount(
+              bookid,
+              book.comments.length
+            );
+
+            res.json(result);
+          } else {
+            res.send("no book exists");
+          }
+        } catch (e) {
+          console.log(e);
+          let message =
+            e.errors !== undefined
+              ? e.errors.comment.message
+              : "An unknown error occurred";
+
+          res.send(message);
+        }
+      };
     })
 
     .delete(function (req, res) {
       let bookid = req.params.id;
-      //if successful response will be 'delete successful'
+
+      crud
+        .deleteBook(bookid)
+        .then(() =>
+          crud.deleteComments(bookid).then(() => res.send("delete successful"))
+        )
+        .catch(() => res.send("no book exists"));
     });
 };
