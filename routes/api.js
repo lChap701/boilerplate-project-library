@@ -1,8 +1,10 @@
 "use strict";
 
+const crud = require("../crud");
+
 /**
  * Module that handles most of the routing
- * @module ./routes/api.js
+ * @module ./routes/api
  *
  * @param {*} app   Represents the Express application
  *
@@ -11,13 +13,14 @@ module.exports = function (app) {
   app
     .route("/api/books")
     .get(function (req, res) {
-      //response will be array of book objects
-      //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
+      crud.getAllBooks().then((books) => res.json(books));
     })
 
     .post(function (req, res) {
-      let title = req.body.title;
-      //response will contain new book object including atleast _id and title
+      crud
+        .addBook({ title: req.body.title })
+        .then((result) => res.json(result))
+        .catch((e) => res.send(e.errors.title.message));
     })
 
     .delete(function (req, res) {
