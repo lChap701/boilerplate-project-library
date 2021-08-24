@@ -14,7 +14,10 @@ module.exports = function (app) {
   app
     .route("/api/books")
     .get(function (req, res) {
-      crud.getAllBooks().then((books) => res.json(books));
+      crud
+        .getAllBooks()
+        .then((books) => res.json(books))
+        .catch("unable to access the collection for all books");
     })
 
     .post(function (req, res) {
@@ -25,25 +28,28 @@ module.exports = function (app) {
     })
 
     .delete(function (req, res) {
-      crud
-        .deleteAllBooks()
-        .then(() =>
-          crud
-            .deleteAllComments()
-            .then(() => res.send("complete delete successful"))
-        );
+      try {
+        crud.deleteAllBooks();
+        crud.deleteAllComments();
+        res.send("complete delete successful");
+      } catch {
+        res.send("unable to complete delete");
+      }
     });
 
   app
     .route("/api/books/:id")
     .get(function (req, res) {
-      crud.getBook(req.params.id).then((book) => {
-        if (book) {
-          res.json(book);
-        } else {
-          res.send("no book exists");
-        }
-      });
+      crud
+        .getBook(req.params.id)
+        .then((book) => {
+          if (book) {
+            res.json(book);
+          } else {
+            res.send("no book exists");
+          }
+        })
+        .catch("unable to access the collection for all books");
     })
 
     .post(function (req, res) {
@@ -87,10 +93,16 @@ module.exports = function (app) {
       let bookid = req.params.id;
 
       crud
-        .deleteBook(bookid)
-        .then(() =>
-          crud.deleteComments(bookid).then(() => res.send("delete successful"))
-        )
-        .catch(() => res.send("no book exists"));
+        .getBook(bookid)
+        .then((book) => {
+          if (book) {
+            crud.deleteBook(bookid);
+            crud.deleteAllComments(bookid);
+            res.send("delete successful");
+          } else {
+            res.send("no book exists");
+          }
+        })
+        .catch(() => res.send("unable to delete"));
     });
 };
