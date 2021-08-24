@@ -20,7 +20,7 @@ const bookSchema = new Schema({
 });
 
 const commentSchema = new Schema({
-  thoughts: String,
+  comment: String,
   book: { type: Schema.Types.ObjectId, ref: "Books" },
 });
 
