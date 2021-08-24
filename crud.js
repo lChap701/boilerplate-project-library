@@ -20,7 +20,11 @@ const bookSchema = new Schema({
 });
 
 const commentSchema = new Schema({
-  comment: String,
+  comment: {
+    type: String,
+    trim: true,
+    required: "missing required field comment",
+  },
   book: { type: Schema.Types.ObjectId, ref: "Books" },
 });
 
