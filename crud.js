@@ -11,7 +11,7 @@ mongoose.connect(process.env.DB, {
 const Schema = mongoose.Schema;
 
 const bookSchema = new Schema({
-  title: { type: String, required: "missing required field title" },
+  title: { type: String, trim: true, required: "missing required field title" },
   comments: {
     type: [{ type: Schema.Types.ObjectId, ref: "Comments" }],
     default: [],
