@@ -13,7 +13,10 @@ module.exports = function (app) {
   app
     .route("/api/books")
     .get(function (req, res) {
-      crud.getAllBooks().then((books) => res.json(books));
+      crud
+        .getAllBooks()
+        .then((books) => res.json(books))
+        .catch(() => res.send("no book exists"));
     })
 
     .post(function (req, res) {
@@ -24,7 +27,11 @@ module.exports = function (app) {
     })
 
     .delete(function (req, res) {
-      //if successful response will be 'complete delete successful'
+      console.log(req.body);
+      crud
+        .deleteBook(req.body._id)
+        .then(() => res.send("delete successful"))
+        .catch(() => res.send("no book exists"));
     });
 
   app
