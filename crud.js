@@ -45,7 +45,8 @@ const crud = {
   getAllBooks: () => Book.find({}),
   getAllComments: (bookId) => Comment.find({ book: bookId }),
   updateBookComments: (book, comment) => {
-    book.comments.push(comment);
+    book.commentRefs.push(comment);
+    book.comments.push(comment.comment);
     book.save();
   },
   updateCommentcount: (bookId, count) => Book.updateOne({ _id: bookId }, count),
