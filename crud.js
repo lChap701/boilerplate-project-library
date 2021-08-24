@@ -12,7 +12,10 @@ const Schema = mongoose.Schema;
 
 const bookSchema = new Schema({
   title: { type: String, required: "missing required field title" },
-  comments: [{ type: Schema.Types.ObjectId, ref: "Comments" }],
+  comments: {
+    type: [{ type: Schema.Types.ObjectId, ref: "Comments" }],
+    default: [],
+  },
   commentcount: { type: Number, default: 0 },
 });
 
