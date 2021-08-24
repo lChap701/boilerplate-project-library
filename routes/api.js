@@ -13,10 +13,7 @@ module.exports = function (app) {
   app
     .route("/api/books")
     .get(function (req, res) {
-      crud
-        .getAllBooks()
-        .then((books) => res.json(books))
-        .catch(() => res.send("no book exists"));
+      crud.getAllBooks().then((books) => res.json(books));
     })
 
     .post(function (req, res) {
