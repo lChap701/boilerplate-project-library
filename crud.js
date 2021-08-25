@@ -12,7 +12,7 @@ const Schema = mongoose.Schema;
 
 const bookSchema = new Schema({
   title: { type: String, trim: true, required: "missing required field title" },
-  commentRefs: {
+  commentrefs: {
     type: [{ type: Schema.Types.ObjectId, ref: "Comments" }],
     default: [],
   },
@@ -45,11 +45,12 @@ const crud = {
   getAllBooks: () => Book.find({}),
   getAllComments: (bookId) => Comment.find({ book: bookId }),
   updateBookComments: (book, comment) => {
-    book.commentRefs.push(comment);
+    book.commentrefs.push(comment._id);
     book.comments.push(comment.comment);
     book.save();
   },
-  updateCommentcount: (bookId, count) => Book.updateOne({ _id: bookId }, count),
+  updateCommentcount: (bookId, count) =>
+    Book.updateOne({ _id: bookId }, { commentcount: count }),
   deleteBook: (bookId) => Book.deleteOne({ _id: bookId }),
   deleteComments: (bookId) => Comment.deleteMany({ book: bookId }),
   deleteAllBooks: () => Book.deleteMany({}),
