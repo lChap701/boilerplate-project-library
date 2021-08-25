@@ -275,11 +275,38 @@ suite("Functional Tests", function () {
 
     suite("DELETE /api/books/[id] => delete book object id", function () {
       test("Test DELETE /api/books/[id] with valid id in db", function (done) {
-        done();
+        crud.getAllBooks().then((books) => {
+          const book = books[books.length - 1];
+
+          chai
+            .request(server)
+            .delete(PATH + "/" + book._id)
+            .end((err, res) => {
+              console.log(res.status);
+              assert.equal(res.status, 200, "response status should be 200");
+              assert.equal(
+                res.text,
+                "delete successful",
+                "response text should equal 'delete successful'"
+              );
+              done();
+            });
+        });
       });
 
       test("Test DELETE /api/books/[id] with  id not in db", function (done) {
-        done();
+        chai
+          .request(server)
+          .delete(PATH + "/7597e280d35ae174eeddf13c")
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.equal(
+              res.text,
+              "no book exists",
+              "response text should equal 'no book exists'"
+            );
+            done();
+          });
       });
     });
   });
