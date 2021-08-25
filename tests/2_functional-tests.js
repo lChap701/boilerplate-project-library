@@ -7,8 +7,6 @@ const crud = require("../crud");
 chai.use(chaiHttp);
 
 suite("Functional Tests", function () {
-  this.timeout(15000);
-
   test("#example Test GET /api/books", function (done) {
     chai
       .request(server)
@@ -282,7 +280,6 @@ suite("Functional Tests", function () {
             .request(server)
             .delete(PATH + "/" + book._id)
             .end((err, res) => {
-              console.log(res.status);
               assert.equal(res.status, 200, "response status should be 200");
               assert.equal(
                 res.text,
