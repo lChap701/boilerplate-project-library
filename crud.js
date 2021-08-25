@@ -51,10 +51,10 @@ const crud = {
   },
   updateCommentcount: (bookId, count) =>
     Book.updateOne({ _id: bookId }, { commentcount: count }),
-  deleteBook: (bookId) => Book.deleteOne({ _id: bookId }),
-  deleteComments: (bookId) => Comment.deleteMany({ book: bookId }),
-  deleteAllBooks: () => Book.deleteMany({}),
-  deleteAllComments: () => Comment.deleteMany({}),
+  deleteBook: async (bookId) => await Book.deleteOne({ _id: bookId }),
+  deleteComments: async (bookId) => await Comment.deleteMany({ book: bookId }),
+  deleteAllBooks: async () => await Book.deleteMany({}),
+  deleteAllComments: async () => await Comment.deleteMany({}),
 };
 
 module.exports = crud;
