@@ -25,13 +25,9 @@ module.exports = function (app) {
     })
 
     .delete(function (req, res) {
-      try {
-        crud.deleteAllBooks();
-        crud.deleteAllComments();
-        res.send("complete delete successful");
-      } catch {
-        res.send("unable to complete delete");
-      }
+      crud.deleteAllBooks();
+      crud.deleteAllComments();
+      res.send("complete delete successful");
     });
 
   app
@@ -76,17 +72,14 @@ module.exports = function (app) {
     .delete(function (req, res) {
       let bookid = req.params.id;
 
-      crud
-        .getBook(bookid)
-        .then((book) => {
-          if (book) {
-            crud.deleteBook(bookid);
-            crud.deleteComments(bookid);
-            res.send("delete successful");
-          } else {
-            res.send("no book exists");
-          }
-        })
-        .catch(() => res.send("unable to delete"));
+      crud.getBook(bookid).then((book) => {
+        if (book) {
+          crud.deleteBook(bookid);
+          crud.deleteComments(bookid);
+          res.send("delete successful");
+        } else {
+          res.send("no book exists");
+        }
+      });
     });
 };
