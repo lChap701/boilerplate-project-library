@@ -14,10 +14,7 @@ module.exports = function (app) {
   app
     .route("/api/books")
     .get(function (req, res) {
-      crud
-        .getAllBooks()
-        .then((books) => res.json(books))
-        .catch("unable to access the collection for all books");
+      crud.getAllBooks().then((books) => res.json(books));
     })
 
     .post(function (req, res) {
@@ -40,53 +37,40 @@ module.exports = function (app) {
   app
     .route("/api/books/:id")
     .get(function (req, res) {
-      crud
-        .getBook(req.params.id)
-        .then((book) => {
-          if (book) {
-            res.json(book);
-          } else {
-            res.send("no book exists");
-          }
-        })
-        .catch("unable to access the collection for all books");
+      crud.getBook(req.params.id).then((book) => {
+        if (book) {
+          res.json(book);
+        } else {
+          res.send("no book exists");
+        }
+      });
     })
 
     .post(function (req, res) {
       let bookid = req.params.id;
 
-      async () => {
-        try {
-          const book = await crud.getBook(bookid);
+      crud.getBook(bookid).then((book) => {
+        if (book) {
+          crud
+            .addComment({ comment: req.body.comment, book: book._id })
+            .then((comment) => {
+              crud.updateBookComments(book, comment);
 
-          if (book) {
-            const comment = await crud.addComment({
-              comment: req.body.comment,
-              book: book,
-            });
-            console.log(comment);
-
-            crud.updateBookComments(book, comment);
-            console.log(book);
-            const result = await crud.updateCommentcount(
-              bookid,
-              book.comments.length
-            );
-
-            res.json(result);
-          } else {
-            res.send("no book exists");
-          }
-        } catch (e) {
-          console.log(e);
-          let message =
-            e.errors !== undefined
-              ? e.errors.comment.message
-              : "An unknown error occurred";
-
-          res.send(message);
+              crud
+                .updateCommentcount(bookid, book.comments.length)
+                .then((result) => {
+                  if (result) {
+                    crud.getBook(bookid).then((book) => res.json(book));
+                  } else {
+                    res.send("updating the 'commentcount' property failed");
+                  }
+                });
+            })
+            .catch((e) => res.send(e.errors.comment.message));
+        } else {
+          res.send("no book exists");
         }
-      };
+      });
     })
 
     .delete(function (req, res) {
@@ -97,7 +81,7 @@ module.exports = function (app) {
         .then((book) => {
           if (book) {
             crud.deleteBook(bookid);
-            crud.deleteAllComments(bookid);
+            crud.deleteComments(bookid);
             res.send("delete successful");
           } else {
             res.send("no book exists");
