@@ -294,7 +294,7 @@ suite("Functional Tests", function () {
         });
       });
 
-      test("Test DELETE /api/books/[id] with  id not in db", function (done) {
+      test("Test DELETE /api/books/[id] with id not in db", function (done) {
         chai
           .request(server)
           .delete(PATH + "/7597e280d35ae174eeddf13c")
