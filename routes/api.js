@@ -3,6 +3,9 @@
 const e = require("express");
 const crud = require("../crud");
 
+const BadWords = require("bad-words");
+let filter = new BadWords();
+
 /**
  * Module that handles most of the routing
  * @module ./routes/api
@@ -18,8 +21,15 @@ module.exports = function (app) {
     })
 
     .post(function (req, res) {
+      const { title } = req.body;
+
+      if (filter.isProfane(title)) {
+        res.send("Curse words are not allowed");
+        return;
+      }
+
       crud
-        .addBook({ title: req.body.title })
+        .addBook({ title: title })
         .then((result) => res.json(result))
         .catch((e) => res.send(e.errors.title.message));
     })
@@ -47,8 +57,15 @@ module.exports = function (app) {
 
       crud.getBook(bookid).then((book) => {
         if (book) {
+          const { comment } = req.body;
+
+          if (filter.isProfane(comment)) {
+            res.send("Curse words are not allowed");
+            return;
+          }
+
           crud
-            .addComment({ comment: req.body.comment, book: book._id })
+            .addComment({ comment: comment, book: book._id })
             .then((comment) => {
               crud.updateBookComments(book, comment);
 
