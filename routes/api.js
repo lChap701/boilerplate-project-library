@@ -5,6 +5,7 @@ const crud = require("../crud");
 
 const BadWords = require("bad-words");
 let filter = new BadWords();
+filter.removeWords("dick", "pussy", "Nazi", "Nazis");
 
 /**
  * Module that handles most of the routing
